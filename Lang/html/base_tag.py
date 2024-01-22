@@ -1,0 +1,45 @@
+from typing import *
+from typing import Any, List, Optional
+
+from Lang.core.block import Block, OpenBlock
+from Lang.id import HEAD_ID
+
+from Lang.style.utils.clear import clear
+from Lang.style.utils.new_page import new_page
+from Lang.style.utils.in_new_page import in_new_page
+from Lang.style.utils.dont_split import dont_split
+from Lang.style.utils.margin_right import margin_right
+from Lang.style.utils.margin_left import margin_left
+
+class _OpenBaseTag(OpenBlock):
+	tag: object
+
+	def __init__(self, head) -> None:
+		self.tag = head
+
+	async def __aenter__(self, *args, **kwargs):
+		self.tag.__enter__()
+		return self
+	
+	async def __aexit__(self, *args, **kwargs):
+		self.tag.__exit__(None, None, None)
+
+class BaseTag(Block):
+	_tag: str
+
+	def __init__(self, tag: str, *args, block_id: int=None, next_blocks: List[Block] | None = None, **kwargs) -> None:
+		self._tag = tag
+
+		super().__init__(*args, block_id=block_id, next_blocks=next_blocks, **kwargs)
+
+	def __call__(self, document: 'Document', *args: Any, **kwargs: Any) -> _OpenBaseTag:		
+		args, kwargs = self._merge_args_kwargs(args, kwargs)
+
+		return _OpenBaseTag(document.tag(self._tag, *args, **kwargs))
+	
+	clear=clear
+	new_page = new_page
+	in_new_page = in_new_page
+	dont_split = dont_split
+	margin_right = margin_right
+	margin_left = margin_left
