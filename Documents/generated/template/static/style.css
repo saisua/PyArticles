@@ -1,0 +1,58 @@
+body {
+	background-color: #444; 
+	color: #BBB;
+}
+
+.title {
+	text-align: center;
+	white-space: pre-line;
+}
+.subtitle {
+	text-align: center;
+	white-space: pre-line;
+}
+.authors {
+	text-align: right;
+	white-space: pre-line;
+	margin-right: 10%;
+}
+
+a[href] {
+	color: red;
+}
+
+table {
+	border-collapse: collapse;
+	margin: 1% 0;
+	font-size: 0.9em;
+	box-shadow: 0 0 1% rgba(0, 0, 0, 0.15);
+	margin-left: auto;
+    margin-right: auto;
+	table-layout: fixed;
+	max-width: 96%;
+}
+
+table img {
+	object-fit: contain;
+	width: 100%;
+}
+
+thead tr {
+	background-color: #009879;
+	color: #ffffff;
+	text-align: center;
+}
+
+tbody tr {
+	border-bottom: 1px solid #dddddd;
+	border-left: 1px solid #dddddd;
+	border-right: 1px solid #dddddd;
+}
+
+tbody tr:nth-of-type(even) {
+	background-color: #f3f3f333;
+}
+
+tbody tr:last-of-type {
+	border-bottom: 2px solid #c0fff2;
+}
