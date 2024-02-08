@@ -1,0 +1,3 @@
+ABSTRACT='Abstract'
+
+all = globals()
