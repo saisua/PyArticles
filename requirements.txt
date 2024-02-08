@@ -1,7 +1,8 @@
 django~=5.0.1
 yattag~=1.15.2
 yawrap~=0.4.10
-aiofiles=~23.2.1
+aiofiles~=23.2.1
 wikipedia~=1.4.0
 pandas~=2.1.4
 pybtex~=0.24.0
+# weasyprint
