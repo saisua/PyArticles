@@ -66,6 +66,10 @@ class Images:
 		self._entries = dict()
 		self._rendered = set()
 
+	def clear(self):
+		self._entries.clear()
+		self._rendered.clear()
+
 	def add(self, src: str, caption: str=None, *args: Any, **kwargs: Any) -> Image_entry:
 		if(DEFAULT_REFERENCE_KEY not in kwargs):
 			kwargs[DEFAULT_REFERENCE_KEY] = f"{DEFAULT_FIGURE_REF_PREFIX}{src}"
