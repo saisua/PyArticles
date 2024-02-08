@@ -17,19 +17,14 @@ nl_cleanup_re: re.Pattern = re.compile(r"\n{2}")
 
 class _text(Block):
 	text: str
+	replacements: Dict
 
 	_format_args: Tuple[str, ...]
 	_format_kwargs: Dict[str, str]
 
-	def __init__(self, text: str, *args, next_blocks: List[Block] | None = None, **kwargs) -> None:
-		self.text = nl_cleanup_re.sub(
-			'\n',
-		lone_nl_cleanup_re.sub(
-			'\g<1>\g<2>',
-		space_cleanup_re.sub(
-			' ',
-			text
-		)))
+	def __init__(self, text: str, replacements: Dict={}, *args, next_blocks: List[Block] | None = None, **kwargs) -> None:
+		self.text = text
+		self.replacements = replacements
 
 		self._format_args = tuple()
 		self._format_kwargs = dict()
@@ -37,20 +32,74 @@ class _text(Block):
 		super().__init__(*args, block_id=TEXT_ID, next_blocks=next_blocks, **kwargs)
 
 	def __call__(self, document: 'Document', *args: Any, **kwargs: Any) -> None:
-		document.text(self.render())
+		rendered_text = self.render()
 
-	def render(self) -> str:
-		return self._formatted_text(str(self.text))
+		if(isinstance(rendered_text, str)):
+			document.text(rendered_text)
+		elif(isinstance(rendered_text, (list, tuple))):
+			new_next = []
+			for sub_block in rendered_text:
+				if(isinstance(sub_block, str)):
+					new_next.append(_text(sub_block))
+				else:
+					new_next.append(sub_block)
+
+			self._next = [*new_next, *self._next]
+
+	def render(self):
+		return self._formatted_text(self.text)
 
 	def _formatted_text(self, text: str) -> str:
-		return text.format(*self._format_args, **self._format_kwargs)
+		text = self._cleanup_format(text)
+		text = text.format(*self._format_args, **self._format_kwargs)
+		if(len(self.replacements)):
+			text = self._replacement_format(text)
+		return text
+
+	def _cleanup_format(self, text: str) -> str:
+		return nl_cleanup_re.sub(
+			'\n',
+			lone_nl_cleanup_re.sub(
+				'\g<1>\g<2>',
+			space_cleanup_re.sub(
+				' ',
+				text
+		)))
+
+	def _replacement_format(self, text: str) -> Union[str, list]:
+		secondary_queue = []
+		text_queue = [text]
+
+		replacements = dict(reversed(sorted(
+			self.replacements.items(),
+			key=lambda tup: len(tup[0])
+		)))
+
+		for token, replacement in replacements.items():
+			for text in text_queue:
+				if(not isinstance(text, str)):
+					secondary_queue.append(text)
+					continue
+
+				split_text = text.split(token)
+				for n, split in enumerate(split_text):
+					if(n):
+						secondary_queue.append(replacement)
+					secondary_queue.append(split)
+
+			text_queue, secondary_queue = secondary_queue, text_queue
+			secondary_queue.clear()
+
+		if(len(text_queue) == 1):
+			return text_queue[0]
+		return text_queue
 
 	def format(self, *args, **kwargs):
 		self._format_args = args
 		self._format_kwargs = kwargs
 	
-def text(text: str, *args, next_blocks: List[Block] | None = None, format: Dict=None, tag: Block=span, **kwargs) -> TextTag:
-	text = _text(text)
+def text(text: str, replacements: Dict={}, *args, next_blocks: List[Block] | None = None, format: Dict=None, tag: Block=span, **kwargs) -> TextTag:
+	text = _text(text, replacements)
 
 	if(format is not None):
 		text.format(**format)

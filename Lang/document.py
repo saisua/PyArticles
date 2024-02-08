@@ -104,6 +104,8 @@ class Document:
 
 			if(isinstance(block, str)):
 				block = _text(block)
+			elif(block is None):
+				continue
 
 			# And we open it
 			open_block = block(self)
@@ -152,3 +154,12 @@ class Document:
 		
 		async with aiofiles.open(os.path.join(output_path, output_fname), 'w+') as f:
 			await f.write(doc_str)
+
+	@property
+	def keywords(self):
+		return self.LangKeyWords(self)
+
+	class LangKeyWords:
+		def __init__(self, doc: 'Document'):
+			for kw, value in doc._lang_data.items():
+				setattr(self, kw, value)
