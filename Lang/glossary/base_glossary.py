@@ -43,10 +43,10 @@ class BaseGlossary:
 				unordered_list([
 					div([
 						b(
-							text(f"{entry.name}:\n"),
+							text(f"{entry.name}:"),
 							id=f"{DEFAULT_GLOSSARY_REF_PREFIX}{entry.name}"
 						),
-						text(f"{entry.description}\n\n")
+						text(f" {entry.description}\n\n")
 					])
 					for entry in self._entries.values()
 				]),

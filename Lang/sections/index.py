@@ -10,6 +10,8 @@ from Lang.text.text import _text as text
 
 from Lang.style.utils.margin_left import margin_left
 
+from Lang.defaults import DEFAULT_REFERENCE_KEY
+
 class DelayedIndex(BaseTag):
 	_index: 'Index'
 	def __init__(self, index: 'Index', *args, block_id: int = None, next_blocks: List[Block] | None = None, **kwargs) -> None:
@@ -49,12 +51,16 @@ class Index:
 	_bleeding: float
 	_sep: str
 
+	_kwargs: dict
+
 	def __init__(self, *args, next_blocks: List[Block] | None = None, bleeding: float=1.5, sep: str='. ', **kwargs) -> None:
 		self._section = [0]
 		self._section_names = {}
 
 		self._bleeding = 1.5
 		self._sep = sep
+
+		self._kwargs = kwargs
 
 	def clear(self) -> None:
 		self._section_names.clear()
@@ -68,11 +74,14 @@ class Index:
 
 		self._section_names[section_number] = section_name
 
+		_kwargs = self._kwargs.copy()
+		_kwargs.update(kwargs)
+
 		return margin_left(
 			div(h(
 				min(6, len(self._section) - 1 or 1), 
 				text(f"{section_number}{self._sep}{section_name}"),
-				id=section_name,
+				id=_kwargs.get(DEFAULT_REFERENCE_KEY, section_name),
 			), *args, **kwargs),
 			f"{min(6, len(self._section) - 1)*(bleeding or self._bleeding)}%"
 		)

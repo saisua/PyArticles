@@ -34,7 +34,7 @@ class AcronymWithCiteEntry(BaseAcronymEntry):
 		return self._plural_wc_cls(self)
 
 	class _plural_wc_cls(BaseAcronymEntry._plural_cls):
-		def __call__(self) -> Any:
+		def __call__(self, doc: 'document'=None) -> Any:
 			self.counter += 1
 			if(self.counter == 1):
 				self._bacr._registry._used.add(self._bacr.short)
@@ -42,7 +42,7 @@ class AcronymWithCiteEntry(BaseAcronymEntry):
 				cite = self._registry._citations.cite(self.short)
 
 				return span([
-					a(_text(f"{self.long_plural} ({self.short_plural})"), href=self.reference),
+					a(_text(f"{self.long_plural or self.long} ({self.short_plural})"), href=self.reference),
 					cite,
 				])
 			return a(_text(self.short_plural), href=self.reference)
@@ -52,5 +52,5 @@ class AcronymWithCiteEntry(BaseAcronymEntry):
 			if(self.counter == 1):
 				self._bacr._registry._used.add(self._bacr.short)
 
-				return f"{self.long_plural} ({self.short_plural})"
+				return f"{self.long_plural or self.long} ({self.short_plural})"
 			return self.short_plural

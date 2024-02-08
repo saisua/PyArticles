@@ -11,8 +11,9 @@ from Lang.id import TEXT_ID
 
 from Lang.style.utils.enable_newlines_text import enable_newlines_text
 
-space_cleanup_re: re.Pattern = re.compile(r"([ \t]+|\n(?!\n))")
-nl_cleanup_re: re.Pattern = re.compile(r"\n+")
+lone_nl_cleanup_re: re.Pattern = re.compile(r"([^\n]|^)\n([^\n]|$)")
+space_cleanup_re: re.Pattern = re.compile(r"[ \t]+")
+nl_cleanup_re: re.Pattern = re.compile(r"\n{2}")
 
 class _text(Block):
 	text: str
@@ -23,9 +24,12 @@ class _text(Block):
 	def __init__(self, text: str, *args, next_blocks: List[Block] | None = None, **kwargs) -> None:
 		self.text = nl_cleanup_re.sub(
 			'\n',
-			space_cleanup_re.sub(' ', 
-				text
-		)	)
+		lone_nl_cleanup_re.sub(
+			'\g<1>\g<2>',
+		space_cleanup_re.sub(
+			' ',
+			text
+		)))
 
 		self._format_args = tuple()
 		self._format_kwargs = dict()
