@@ -74,14 +74,18 @@ class Block:
 		self._kwargs = kwargs
 
 		self._children = set()
-		if next_blocks:
+		if next_blocks is not None:
 			if(not isinstance(next_blocks, (list, tuple))):
 				next_blocks = [next_blocks]
 				
-			self._next = list(filter(None, next_blocks))
-			for block in self._next:
-				self._children.add(block._id)
-				self._children.update(block._children)
+			if(len(next_blocks)):
+				self._next = list(filter(lambda x: x is not None, next_blocks))
+				for block in self._next:
+					if(isinstance(block, str)):
+						from Lang.text.text import _text
+						block = _text(block)
+					self._children.add(block._id)
+					self._children.update(block._children)
 		else:
 			self._next = list()
 
@@ -161,6 +165,16 @@ class Block:
 	def __radd__(self, block: 'Block' | List['Block'] | Tuple['Block']) -> Self:
 		return self.__add__(block)
 	
+	def reference_to(self, block: Union['Block', str]) -> Self:
+		if(isinstance(block, Block)):
+			self._kwargs[DEFAULT_GOTO_REFERENCE_KEY] = block.reference
+		elif(isinstance(block, str)):
+			self._kwargs[DEFAULT_GOTO_REFERENCE_KEY] = block
+		else:
+			raise ValueError("Reference is not a block nor a string")
+
+		return self
+
 	@property
 	def reference(self) -> str:
 		if(DEFAULT_REFERENCE_KEY in self._kwargs):

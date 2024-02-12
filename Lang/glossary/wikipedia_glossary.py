@@ -1,9 +1,13 @@
 from typing import Any
 import wikipedia
 
+import re
+
 from Lang.glossary.base_glossary import BaseGlossary
 
 from Lang.glossary.base_glossary_entry import BaseGlossaryEntry
+
+wiki_ref_pattern = re.compile(r'\[\d+\]')
 
 class WikipediaGlossary(BaseGlossary):
 	def __init__(self, language: str=None) -> None:
@@ -15,9 +19,12 @@ class WikipediaGlossary(BaseGlossary):
 	def add(self, name: str, description: str=None, *args: Any, **kwargs: Any) -> BaseGlossaryEntry:
 		if(description is None):
 			try:
-				description = wikipedia.summary(name)
-			except Exception:
-				...
+				description = wiki_ref_pattern.sub(
+					'',
+					str(wikipedia.summary(name))
+				)
+			except Exception as err:
+				print(f"[-] WikipediaGlossary: {err}")
 
 		entry = BaseGlossaryEntry(name=name, description=description)
 

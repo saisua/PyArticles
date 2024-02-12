@@ -1,4 +1,4 @@
-from typing import Any
+from typing import *
 
 from Lang.core.block import Block
 
@@ -11,29 +11,44 @@ from Lang.id import ACRONYM_ID
 class BaseAcronymEntry(Block):
 	_registry: 'BaseAcronyms'
 
-	short: str
-	short_plural: str
-	long: str
-	long_plural: str
+	_short: str
+	_short_plural: str
+	_long: str
+	_long_plural: str
 
 	counter: int
+
+	_transformations: List[Callable]
 
 	def __init__(self, registry: 'BaseAcronyms', short: str, long: str=None, *, short_plural: str=None, long_plural: str=None) -> None:
 		self._registry = registry
 
-		self.short = short
-		self.long = long
+		self._short = short
+		self._long = long
 
-		self.short_plural = short_plural
-		self.long_plural = long_plural
+		self._short_plural = short_plural
+		self._long_plural = long_plural
 
 		self.counter = 0
+
+		self._transformations = []
 
 		super().__init__(block_id=ACRONYM_ID)
 
 	def clear(self) -> None:
 		self.counter = 0
 
+	def __radd__(self, other):
+		if(hasattr(other, '__str__')):
+			other = str(other)
+		if(isinstance(other, str)):
+			return other + self.__str__()
+	def __add__(self, other):
+		if(hasattr(other, '__str__')):
+			other = str(other)
+		if(isinstance(other, str)):
+			return self.__str__() + other
+		
 	def __str__(self) -> str:
 		self.counter += 1
 		if(self.long and self.counter == 1):
@@ -43,6 +58,35 @@ class BaseAcronymEntry(Block):
 		return a(_text(self.short), href=self.reference)
 	
 	@property
+	def short(self) -> str:
+		text = self._short
+		for fn in self._transformations:
+			text = fn(text)
+
+		return text
+	@property
+	def short_plural(self) -> str:
+		text = self._short_plural
+		for fn in self._transformations:
+			text = fn(text)
+
+		return text
+	@property
+	def long(self) -> str:
+		text = self._long
+		for fn in self._transformations:
+			text = fn(text)
+
+		return text
+	@property
+	def long_plural(self) -> str:
+		text = self._long_plural
+		for fn in self._transformations:
+			text = fn(text)
+
+		return text
+
+	@property
 	def reference(self):
 		return f"#acro.{self.short}"
 
@@ -50,11 +94,44 @@ class BaseAcronymEntry(Block):
 	def plural(self):
 		return self._plural_cls(self)
 
+	@staticmethod
+	def _lower(text: str) -> str:
+		return text.lower()
+	def lower(self):
+		if(BaseAcronymEntry._lower not in self._transformations):
+			self._transformations.append(BaseAcronymEntry._lower)
+
+	@staticmethod
+	def _upper(text: str) -> str:
+		return text.upper()
+	def upper(self):
+		if(BaseAcronymEntry._upper not in self._transformations):
+			self._transformations.append(BaseAcronymEntry._upper)
+
+	@staticmethod
+	def _capitalize(text: str) -> str:
+		return text.capitalize()
+	def capitalize(self):
+		if(BaseAcronymEntry._capitalize not in self._transformations):
+			self._transformations.append(BaseAcronymEntry._capitalize)
+
+
 	class _plural_cls:
 		_bacr: 'BaseAcronymEntry'=None
 
 		def __init__(self, bacr: 'BaseAcronymEntry') -> None:
 			self._bacr = bacr
+
+		def __radd__(self, other):
+			if(hasattr(other, '__str__')):
+				other = str(other)
+			if(isinstance(other, str)):
+				return other + self.__str__()
+		def __add__(self, other):
+			if(hasattr(other, '__str__')):
+				other = str(other)
+			if(isinstance(other, str)):
+				return self.__str__() + other
 		
 		def __str__(self) -> str:
 			self.counter += 1

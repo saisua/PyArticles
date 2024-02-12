@@ -10,3 +10,12 @@ class traductions:
 
 	def __getitem__(self, item: str) -> str:
 		return self._data[item]
+
+	def items(self):
+		return self._data.items()
+
+	def values(self):
+		return self._data.values()
+
+	def keys(self):
+		return self._data.keys()

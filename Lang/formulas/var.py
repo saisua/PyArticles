@@ -9,11 +9,14 @@ from Lang.formulas.mathml.html.mi import mi
 from Lang.formulas.base_var import BaseVar
 
 class Var(BaseVar):
-	def __init__(self, name: Any) -> None:
+	_value: Any
+
+	def __init__(self, name: Any, value: Any=None) -> None:
 		self._data = name
+		self._value = value
 
 	def compute(self, **kwargs):
-		out = kwargs.get(self._data)
+		out = kwargs.get(self._data, self._value)
 		if(out is None):
 			raise ValueError(f"Missing variable: \'{self._data}\'")
 		

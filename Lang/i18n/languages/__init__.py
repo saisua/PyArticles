@@ -1,5 +1,7 @@
 from .spanish import all as spanish
+from .english import all as english
 
 all = {
-	'es': spanish
+	'es': spanish,
+	'en': english,
 }

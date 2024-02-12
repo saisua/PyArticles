@@ -68,6 +68,6 @@ class table(TextTag):
 	@staticmethod
 	def from_pandas(df: DataFrame) -> TextTag:
 		return table(
-			header=df.columns,
-			items=df.values,
+			header=df.columns.tolist(),
+			items=df.values.tolist(),
 		)

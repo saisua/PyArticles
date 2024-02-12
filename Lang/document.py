@@ -80,6 +80,8 @@ class Document:
 				return block[id]
 	
 	async def _build_doc(self) -> str:
+		from Lang.text.text import _text
+
 		open_block_queue: List[OpenBlock] = []
 		block_queue: List[List[Block]] = [self._blocks]
 
@@ -99,6 +101,11 @@ class Document:
 			# We get the first child of the last
 			# non-childless block in block_queue
 			block = block_queue[-1].pop(0)
+
+			if(isinstance(block, str)):
+				block = _text(block)
+			elif(block is None):
+				continue
 
 			# And we open it
 			open_block = block(self)
@@ -141,9 +148,18 @@ class Document:
 	async def render(self) -> str:
 		return await self._build_doc()
 
-	async def store(self, output_path: str, output_fname: str, doc_str: Optional[str]=None) -> None:
+	async def store(self, output_path: str, output_fname: str, *, doc_str: Optional[str]=None) -> None:
 		if(doc_str is None):
 			doc_str = await self.render()
 		
 		async with aiofiles.open(os.path.join(output_path, output_fname), 'w+') as f:
 			await f.write(doc_str)
+
+	@property
+	def keywords(self):
+		return self.LangKeyWords(self)
+
+	class LangKeyWords:
+		def __init__(self, doc: 'Document'):
+			for kw, value in doc._lang_data.items():
+				setattr(self, kw, value)

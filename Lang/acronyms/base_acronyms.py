@@ -35,10 +35,10 @@ class DelayedAcronyms(TextTag):
 			unordered_list(list((
 				div([
 					b(
-						text(f"{entry.short}{' / ' + entry.short_plural if entry.short_plural else ''}:\n"),
+						text(f"{entry.short}{' / ' + entry.short_plural if entry.short_plural else ''}:"),
 						id=f"{DEFAULT_ACRONYM_REF_PREFIX}{entry.short}"
 					),
-					text(f"{entry.long}{' / ' + entry.long_plural if entry.long_plural else ''}\n")
+					text(f" {entry.long}{' / ' + entry.long_plural if entry.long_plural else ''}\n")
 				])
 				for entry_name, entry in self._acro._entries.items()
 				if entry_name in self._acro._used

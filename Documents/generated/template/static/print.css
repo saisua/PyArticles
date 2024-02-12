@@ -1,0 +1,37 @@
+@page {
+	size: A4;
+
+	margin-top: 90%;
+}
+
+@media print {
+	a[href]{
+		color: darkred;
+	}
+
+	body {
+		background-color: #FFF; 
+		color: #000;
+	}
+
+	figure {
+		display: block;
+		page-break-inside: avoid;
+	}
+
+	.title {
+		margin-top: 40%;
+	}
+	.subtitle {
+		margin-top: 10%;
+	}
+	.authors {
+		margin-top: 60%;
+	}
+
+	.new_page {
+		page-break-before: always;
+		min-height: 1em;
+		margin-bottom: 10%;
+	}
+}

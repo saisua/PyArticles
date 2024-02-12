@@ -39,5 +39,10 @@ class IDs(IntEnum):
 	LINK_SCRIPT_ID: Final[int] = 34
 	NEW_PAGE_ID: Final[int] = 35
 	ACRONYM_ID: Final[int] = 36
+	FIGURE_ID: Final[int] = 37
+	FIGCAPTION_ID: Final[int] = 38
+	BR_ID: Final[int] = 39
+	SUP_ID: Final[int] = 40
+	MROW_ID: Final[int] = 41
 
 globals().update(dict(filter(lambda x: not x[0].startswith('_'), IDs.__dict__.items())))
