@@ -74,17 +74,18 @@ class Block:
 		self._kwargs = kwargs
 
 		self._children = set()
-		if next_blocks:
+		if next_blocks is not None:
 			if(not isinstance(next_blocks, (list, tuple))):
 				next_blocks = [next_blocks]
 				
-			self._next = list(filter(None, next_blocks))
-			for block in self._next:
-				if(isinstance(block, str)):
-					from Lang.text.text import _text
-					block = _text(block)
-				self._children.add(block._id)
-				self._children.update(block._children)
+			if(len(next_blocks)):
+				self._next = list(filter(lambda x: x is not None, next_blocks))
+				for block in self._next:
+					if(isinstance(block, str)):
+						from Lang.text.text import _text
+						block = _text(block)
+					self._children.add(block._id)
+					self._children.update(block._children)
 		else:
 			self._next = list()
 

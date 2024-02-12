@@ -27,6 +27,7 @@ def image(src: str, *args, caption: Optional[str]=None, **kwargs):
 		caption = _text(caption)
 
 	return figure(
-		_image(src, *args, **kwargs),
+		_image(src),
 		figcaption(caption),
+		*args, **kwargs
 	)

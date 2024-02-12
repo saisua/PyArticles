@@ -1,15 +1,13 @@
 from Lang.formulas.base_var import BaseVar
 from Lang.formulas.value import Value
 
-from Lang.formulas.mathml.html.mfrac import mfrac
-from Lang.formulas.mathml.html.mrow import mrow
-from Lang.formulas.mathml.html.mn import mn
+from Lang.html.div import div
 
 from Lang.text.text import _text as text
 
 from Lang.html.base_tag import BaseTag
 
-class Division(BaseVar):
+class Add(BaseVar):
 	def __init__(self, d0: BaseVar | str | int, d1: BaseVar | str | int, ) -> None:
 		if(not isinstance(d0, BaseVar)):
 			d0 = Value(d0)
@@ -27,7 +25,7 @@ class Division(BaseVar):
 		if(isinstance(d1, BaseVar)):
 			d1 = d1.compute(**kwargs)
 
-		return d0 / d1
+		return d0 + d1
 	
 	def render(self) -> BaseTag:
 		d0 = self._data[0]
@@ -42,7 +40,8 @@ class Division(BaseVar):
 		else:
 			d1 = text(str(d1))
 
-		return mfrac([
-			mrow(d0),
-			mrow(d1),
+		return div([
+			d0,
+			text('+'),
+			d1,
 		])

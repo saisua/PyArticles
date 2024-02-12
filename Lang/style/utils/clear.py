@@ -10,7 +10,7 @@ def clear(
 			  Literal['right'],
 			  Literal['both'],
 			  Literal['inherit'],
-		  ]
+		  ]='both'
 		) -> Self:
 	clear_key, clear_value = DEFAULT_CLEAR
 	

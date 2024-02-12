@@ -53,6 +53,16 @@ class Image_entry(MediaTag):
 
 		super().__init__(tag='div', **kwargs)
 
+	def __parse_caption(self, caption) -> list:
+		if(caption is None):
+			return []
+		elif(isinstance(caption, (list, tuple))):
+			return caption
+		elif(isinstance(caption, str)):
+			return [text(caption)]
+		else:
+			return [caption]
+
 	def __call__(self, document: 'Document', *args: Any, **kwargs: Any) -> None:
 		if(self.num is None):
 			self.num = len(self.images._rendered)
@@ -66,7 +76,7 @@ class Image_entry(MediaTag):
 						text(f"{document._lang_data['FIGURE']} {self.num}: "),
 						id=f"{DEFAULT_FIGURE_REF_PREFIX}{self.src}",
 					),
-					text(self.caption)
+					*self.__parse_caption(self.caption)
 				]),
 				style=self.style
 			),
