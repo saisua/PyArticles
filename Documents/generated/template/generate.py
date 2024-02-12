@@ -1,12 +1,21 @@
 import os
 
+import pandas as pd
+import plotly.express as px
+
+
 from Lang.document import Document
 
 from Lang.sections.title import title
 from Lang.style.new_page import new_page
 from Lang.text.text import text
+from Lang.html.table import table
 from Lang.html.span import span
 from Lang.html.h import h
+
+from Lang.formulas.var import Var
+from Lang.formulas.value import Value
+from Lang.formulas.formula import Formula
 
 from Lang.sections.index import Index
 from Lang.citations.base_citations import Citations
@@ -14,10 +23,13 @@ from Lang.acronyms.with_cite.acronyms_with_cite import AcronymsWithCite
 from Lang.glossary.wikipedia_glossary import WikipediaGlossary
 from Lang.media.images import Images
 
+# We create an index manager
 index = Index()
 
+# We create a glossary manager.
+# This one takes from wikipedia the description of non-provided entries
 glossary = WikipediaGlossary()
-python_gl = glossary.add('Python (programming language)')
+python_gl = glossary.add('Python (programming language)', '')
 pyarticles_gl = glossary.add(
 	'PyArticles',
 	"""
@@ -25,24 +37,33 @@ pyarticles_gl = glossary.add(
 	"""
 )
 
+# We create a citations manager
 bib = Citations()
 
+# We create an acronyms manager.
+# This one will automatically cite any citation that exists
+# in the bibliography with the specified id
 acro = AcronymsWithCite(citations=bib)
 python = acro.add('Python', python_gl)
 
 imgs = Images()
+
+e = Var('e', 2.718)
+softmax = Formula(1 / (1 + e ** (-Var('x'))))
 
 tokens = {
 	'\python': python,
 	'\python_description': python_gl.description,
 	'\pyarticles': pyarticles_gl.name,
 	'\pyarticles_description': pyarticles_gl,
+	'\softmax': softmax,
 }
 
 async def generate(output_path: str, output_fname: str):
 	if(not bib.loaded):
 		# Bibliography will only be loaded once
 		await bib.load_bibliography(os.path.join(output_path, 'bibliography.bib'))
+		imgs.static_path = f"{output_path}/static"
 	else:
 		index.clear()
 		acro.clear()
@@ -83,11 +104,48 @@ async def generate(output_path: str, output_fname: str):
 	introduction = index('Introduction')
 	body += introduction
 
+	body += text(
+		"\python without citation (because it is the second apparition)",
+		replacements=tokens
+	)
+
+	# We can insert images without the need to download them
 	body += imgs.add(
 		'https://www.python.org/static/img/python-logo.png',
-		caption="Python logo stolen from python.org"
+		caption=text(
+			"\python logo stolen from python.org",
+			replacements=tokens
+		)
 	)\
 	.float('right')
+
+	body += index('Formulas')\
+	.clear()
+
+	# We can show the formula
+	body += ["Softmax: ", softmax.render()]
+	# And we can generate results if all variables are specified
+	body += f"\n\nExample: softmax(4): {softmax.compute(x=4)}\n\n\n\n"
+
+	# Load data I randomly got online
+	data = pd.read_csv(f'{output_path}/data.csv', sep=';')
+
+	body += index("Pandas table")
+
+	body += "We can easily generate a table from a dataframe, no need of looking up the syntax on how to make a table"
+
+	# We can quickly generate tables from a regular pandas-like dataframe
+	body += table.from_pandas(data.drop_duplicates(subset=["Ramas de actividad"]))
+
+	body += index("Plotly image")
+
+	body += "We also generate an image from a plotly Figure, no need of exporting or learning tikz"
+
+	# We can quickly generate images from plotly images
+	body += imgs.from_plotly(px.scatter(data, y="Total"))\
+	.float('center')
+
+	body += index("Lorem Ipsum")
 
 	body += """
 	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mollis dictum blandit.
