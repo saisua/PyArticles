@@ -7,6 +7,8 @@ from Lang.text.text import _text as text
 
 from Lang.html.base_tag import BaseTag
 
+from Lang.compatibility import *
+
 class Add(BaseVar):
 	def __init__(self, d0: BaseVar | str | int, d1: BaseVar | str | int, ) -> None:
 		if(not isinstance(d0, BaseVar)):
@@ -15,6 +17,9 @@ class Add(BaseVar):
 			d1 = Value(d1)
 
 		self._data = (d0, d1)
+
+	def __repr__(self) -> str:
+		return f"<Add {self._data[0]!r} + {self._data[1]!r}>"
 
 	def compute(self, **kwargs):
 		d0 = self._data[0]
@@ -40,8 +45,9 @@ class Add(BaseVar):
 		else:
 			d1 = text(str(d1))
 
-		return div([
+		# Idk why, but there can't be a 'div' returned here
+		return [
 			d0,
 			text('+'),
 			d1,
-		])
+		]

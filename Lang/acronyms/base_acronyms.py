@@ -1,7 +1,7 @@
-from typing import *
-
 from itertools import chain
+from typing import Coroutine
 
+from Lang.plugin import Plugin
 from Lang.acronyms.base_acronym_entry import BaseAcronymEntry
 from Lang.core.block import Block
 
@@ -18,6 +18,8 @@ from Lang.lists.unordered import unordered_list
 
 from Lang.defaults import DEFAULT_ACRONYM_REF_PREFIX
 
+from Lang.compatibility import *
+
 class DelayedAcronyms(TextTag):
 	_acro: 'BaseAcronyms'
 	def __init__(self, acro: 'BaseAcronyms', *args, next_blocks: List[Block] | None = None, **kwargs) -> None:
@@ -25,7 +27,10 @@ class DelayedAcronyms(TextTag):
 
 		super().__init__('div', *args, next_blocks=next_blocks, **kwargs)
 
-	def __call__(self, document: 'Document', *args: Any, **kwargs: Any) -> None:
+	def __repr__(self) -> str:
+		return f"<DelayedAcronyms acronyms={self._acro!r}>"
+
+	def __call__(self, document: 'Document', mode: str | int=None, *args: Any, **kwargs: Any) -> None:
 		if(not len(self._acro._used)):
 			return
 
@@ -45,7 +50,7 @@ class DelayedAcronyms(TextTag):
 			)))
 		])
 
-class BaseAcronyms:
+class BaseAcronyms(Plugin):
 	_entries = Dict[str, BaseAcronymEntry]
 	_used = Set[str]
 
@@ -53,13 +58,22 @@ class BaseAcronyms:
 		self._entries = dict()
 		self._used = set()
 
-	def clear(self) -> None:
+	def __repr__(self) -> str:
+		return f"<BaseAcronyms _entries=[{', '.join(self._entries.keys())!r}]>"
+
+	async def setup(self, output_path, output_fname, doc: "Document") -> None:
+		self._is_plugin_setup = True	
+
+	async def clear(self) -> None:
 		self._used.clear()
 
 		entry: BaseAcronymEntry
 		for entry in self._entries.values():
 			entry.clear()
 	
+	async def render(self, document: 'document', mode: str | int=None) -> DelayedAcronyms:
+		return DelayedAcronyms(self)
+
 	def add(self, short: str, long: str=None, *, short_plural: str=None, long_plural: str=None) -> BaseAcronymEntry:
 		entry = BaseAcronymEntry(
 			registry=self,
@@ -76,5 +90,3 @@ class BaseAcronyms:
 	def __call__(self, name: str, *args: Any, **kwds: Any) -> Optional[BaseAcronymEntry]:
 		return self._entries.get(name)
 
-	def render(self, document: 'document') -> DelayedAcronyms:
-		return DelayedAcronyms(self)

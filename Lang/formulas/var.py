@@ -1,5 +1,3 @@
-from typing import *
-
 from Lang.text.text import _text as text
 
 from Lang.html.base_tag import BaseTag
@@ -8,6 +6,8 @@ from Lang.formulas.mathml.html.mi import mi
 
 from Lang.formulas.base_var import BaseVar
 
+from Lang.compatibility import *
+
 class Var(BaseVar):
 	_value: Any
 
@@ -15,6 +15,9 @@ class Var(BaseVar):
 		self._data = name
 		self._value = value
 
+	def __repr__(self) -> str:
+		return f"<Var {self._data!r} [{self._value}]>"
+	
 	def compute(self, **kwargs):
 		out = kwargs.get(self._data, self._value)
 		if(out is None):

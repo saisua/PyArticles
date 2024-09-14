@@ -1,6 +1,6 @@
-from typing import *
-
 from Lang.text.text import _text
+
+from Lang.compatibility import *
 
 class BaseGlossaryEntry(_text):
 	_name: str
@@ -17,6 +17,16 @@ class BaseGlossaryEntry(_text):
 		super().__init__(self.name)
 
 
+	def __repr__(self) -> str:
+		if(self.description is not None):
+			short_desc: str
+			if len(self.description) > 15:
+				short_desc = self.description[:15] + '...'
+			else:
+				short_desc = self.description
+			return f"<BaseGlossaryEntry name={self._name} description={short_desc}>"
+		return f"<BaseGlossaryEntry name={self._name}>"
+	
 	@property
 	def name(self) -> str:
 		text = self._name
@@ -25,6 +35,8 @@ class BaseGlossaryEntry(_text):
 
 		return text
 
+	def __call__(self, doc: 'Document', mode: str | int=None) -> str:
+		return self.name
 
 	def __str__(self) -> str:
 		return self.name

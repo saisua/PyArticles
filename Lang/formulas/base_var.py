@@ -1,9 +1,8 @@
-from typing import *
-
 from Lang.core.block import Block
 
+from Lang.compatibility import *
 
-class BaseVar:
+class BaseVar(Block):
 	_data: Block | str
 
 	def __truediv__(self, data: Block | str | int) -> 'Division':
@@ -43,3 +42,6 @@ class BaseVar:
 
 	def render(self):
 		return str(self._data)
+
+	def __call__(self, document: 'Document', *args: Any, mode: str | int=None, **kwargs: Any):
+		return self.render()

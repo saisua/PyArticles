@@ -1,6 +1,6 @@
-from typing import *
-
 from Lang.style.defaults import DEFAULT_MEDIA_FLOAT, DEFAULT_MARGIN_LEFT, DEFAULT_MARGIN_RIGHT, DEFAULT_DISPLAY
+
+from Lang.compatibility import *
 
 def float_media(
 		block: 'Block', 

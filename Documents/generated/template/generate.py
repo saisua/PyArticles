@@ -1,3 +1,4 @@
+from typing import *
 import os
 
 import pandas as pd
@@ -5,17 +6,15 @@ import plotly.express as px
 
 
 from Lang.document import Document
+from Lang.sections.abstract import abstract
 
 from Lang.sections.title import title
 from Lang.style.new_page import new_page
-from Lang.text.text import text
 from Lang.html.table import table
-from Lang.html.span import span
-from Lang.html.h import h
 
 from Lang.formulas.var import Var
-from Lang.formulas.value import Value
 from Lang.formulas.formula import Formula
+from Lang.formulas.code import Code	
 
 from Lang.sections.index import Index
 from Lang.citations.base_citations import Citations
@@ -28,8 +27,9 @@ index = Index()
 
 # We create a glossary manager.
 # This one takes from wikipedia the description of non-provided entries
+# Every reload is quite slow, so disable it during the development
 glossary = WikipediaGlossary()
-python_gl = glossary.add('Python (programming language)', '')
+python_gl = glossary.add('Python (programming language)', '[Disabled due to Wikipedia\'s overhead]')
 pyarticles_gl = glossary.add(
 	'PyArticles',
 	"""
@@ -52,135 +52,155 @@ e = Var('e', 2.718)
 softmax = Formula(1 / (1 + e ** (-Var('x'))))
 
 tokens = {
-	'\python': python,
-	'\python_description': python_gl.description,
-	'\pyarticles': pyarticles_gl.name,
-	'\pyarticles_description': pyarticles_gl,
-	'\softmax': softmax,
+	'-python': python,
+	'-python_description': python_gl.description,
+	'-pyarticles': pyarticles_gl,
+	'-pyarticles_description': pyarticles_gl.description,
+	'-softmax': softmax.render(),
+	'-nl': "\n\n",
 }
 
-async def generate(output_path: str, output_fname: str):
-	if(not bib.loaded):
-		# Bibliography will only be loaded once
-		await bib.load_bibliography(os.path.join(output_path, 'bibliography.bib'))
-		imgs.static_path = f"{output_path}/static"
-	else:
-		index.clear()
-		acro.clear()
-		bib.clear()
-		imgs.clear()
-	
-	# Only 'en' and 'es' supported at the moment
-	doc = Document(output_path, lang='en')
+doc_plugins = [
+	index,
+	glossary,
+	bib,
+	acro,
+	imgs,
+]
 
-	body = doc.body
+# Try to change 'en' to 'es'
+lang = 'en'
+doc = Document(lang=lang, replacements=tokens, plugins=doc_plugins)
+
+if(lang == 'es'):
+	doc._lang_data.update({
+		"Code": "Código",
+		"Formulas": "Formulas",
+		"Pandas_table": "Tabla de Pandas",
+		"Plotly_image": "Imagen de Plotly",
+		"Imported_lorem_ipsum": "Lorem ipsum importado",
+	})
+elif(lang == 'en'):
+	doc._lang_data.update({
+		"Code": "Code",
+		"Formulas": "Formulas",
+		"Pandas_table": "Pandas table",
+		"Plotly_image": "Plotly image",
+		"Imported_lorem_ipsum": "Imported lorem ipsum",
+	})
+
+@doc.attach
+async def generate(document: Document) -> Document:
+	body = document.body
+
+	### TITLE
+
+	# Replace with your title and subtitle.
+	# Optionally, document.keywords can be used 
+	# and the keywords will be in the specified language
 	body += title(
-		doc.keywords.TITLE,
-		doc.keywords.SUBTITLE,
-		'Author\n\nemail@example.com'
+		document.keywords.TITLE, 
+		document.keywords.SUBTITLE,
+		f'{document.keywords.AUTHOR}\n\nemail@example.com'
 	)
 
-	body += h(2, doc.keywords.ABSTRACT)\
-	.center()
-
-	body += text(
+	### ABSTRACT
+	body += abstract(
 		"""
-		This is a template project for the creation of a \pyarticles article.
-		\n
-		\pyarticles_description\n
-		\n
-		It is based on \python.\n
-		\python_description
+		This is a template project for the creation of a -pyarticles article.
+		-nl-nl
+		-pyarticles_description.
+		-nl-nl
+		It is based on -python.
+		-nl-nl
+		-python_description
 		""",
-		replacements=tokens
-	)\
-	.margin_left('15%').margin_right('15%')\
-	.align('justify')
-	body += new_page()
-
-	body += index.render(doc)
-	body += new_page()
-
-	introduction = index('Introduction')
-	body += introduction
-
-	body += text(
-		"\python without citation (because it is the second apparition)",
-		replacements=tokens
 	)
+
+	### INDEX
+	body += index.place()
+	body += new_page()
+
+	### Introduction
+	body += index(document.keywords.INTRODUCTION).render()
 
 	# We can insert images without the need to download them
 	body += imgs.add(
 		'https://www.python.org/static/img/python-logo.png',
-		caption=text(
-			"\python logo stolen from python.org",
-			replacements=tokens
-		)
+		caption="-python logo stolen from python.org",
 	)\
+	.render(document)\
 	.float('right')
 
-	body += index('Formulas')\
-	.clear()
+	body += """
+	-python without citation (because it is the second apparition), as it appeared before
+	in the abstract, and it had an explicit citation there.
+	""",
 
-	# We can show the formula
-	body += ["Softmax: ", softmax.render()]
-	# And we can generate results if all variables are specified
-	body += f"\n\nExample: softmax(4): {softmax.compute(x=4)}\n\n\n\n"
+	### Code
+	body += index(document.keywords.Code)\
+	.render()\
+	.clear()\
 
-	# Load data I randomly got online
-	data = pd.read_csv(f'{output_path}/data.csv', sep=';')
+	body += "We can decorate any function an it will be converted to a text representation of it"
 
-	body += index("Pandas table")
+	@Code
+	def summarize_users(ages: List[int], min_age: int) -> Dict[str, Union[int, float, None]]:
+		"""
+		Summarizes user information by calculating the average age of users.
+		"""
+		total_age = 0
+		num_users = 0
+		
+		for age in ages:
+			if(age >= min_age):
+				total_age += age
+				num_users += 1
+		
+		average_age = total_age / num_users if num_users > 0 else None
+		
+		return {
+			'num_users': num_users,
+			'average_age': average_age
+		}
+	
+	body += summarize_users.render()
+
+	body += f"-nlExample 1: summarize_users([1, 2, 3, 4, 5, 6], 3): {summarize_users([1, 2, 3, 4, 5, 6], 3)}"
+	body += f"-nlExample 2: summarize_users([1, 2, 3, 4, 5, 6], 7): {summarize_users([1, 2, 3, 4, 5, 6], 7)}"
+
+	### Formulas
+	with index(document.keywords.Formulas, body=body) as formulas_index:
+		formulas_index += "We can also use formulas in the documentument, and to compute them-nl"
+
+		# We can show the formula
+		formulas_index += ["Softmax: ", softmax.render()]
+		# And we can generate results if all variables are specified
+		formulas_index += f"-nl-nlExample 1: softmax(4): {softmax.compute(x=4)}"
+		formulas_index += f"-nlExample 2: softmax(4, e=2): {softmax.compute(x=4, e=2)}"
+
+	### Tables
+	body += index(document.keywords.Pandas_table).render()
 
 	body += "We can easily generate a table from a dataframe, no need of looking up the syntax on how to make a table"
 
-	# We can quickly generate tables from a regular pandas-like dataframe
-	body += table.from_pandas(data.drop_duplicates(subset=["Ramas de actividad"]))
+	# Load data I randomly got online
+	data = pd.read_csv(os.path.join(document.path, 'data.csv'), sep=';')
+	data.Total = data.Total.replace({'.': 0, '..': 0}).astype(float)
 
-	body += index("Plotly image")
+	# We can quickly generate tables from a regular pandas-like dataframe
+	body += table.from_pandas(data.drop_duplicates(subset=["Ramas de actividad"]))\
+	.clear()
+
+	### Images
+	body += index(document.keywords.Plotly_image).render()
 
 	body += "We also generate an image from a plotly Figure, no need of exporting or learning tikz"
 
 	# We can quickly generate images from plotly images
-	body += imgs.from_plotly(px.scatter(data, y="Total"))\
+	body += imgs.from_plotly(px.scatter(data, y="Total"), caption="Plotted the table's Total columns")\
+	.render(document)\
 	.float('center')
 
-	body += index("Lorem Ipsum")
-
-	body += """
-	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mollis dictum blandit.
-	Quisque tincidunt dapibus metus, sit amet aliquet odio dapibus vel.
-	Donec pulvinar tincidunt nulla sed placerat. Pellentesque vel fringilla nisl. Nulla quis augue elit.
-	Integer viverra enim ut mi cursus, non pulvinar mauris condimentum. Fusce in cursus tortor.\n
-	\n
-	Morbi non risus a arcu ullamcorper mollis eu nec ex. Vivamus consectetur turpis nisl.
-	Duis in sem ut massa blandit dapibus. Nam et tortor nulla. Cras ac sodales lectus.
-	Aenean aliquet, quam nec ullamcorper ornare, dui tellus feugiat risus, sit amet condimentum est mi sit amet eros.
-	Sed in nunc eget ante imperdiet tempor at ut ligula. Sed eu sagittis mi, sit amet scelerisque justo.
-	Sed tellus arcu, aliquet quis erat a, placerat varius risus. Aliquam in magna vel dolor interdum scelerisque.
-	Donec ex diam, dapibus id consectetur a, lobortis eget tellus. Praesent scelerisque tincidunt ligula, sit amet semper tellus placerat a.\n
-	\n
-	Pellentesque eu mauris in sem commodo pharetra a vitae diam. In tristique lectus ut dolor sollicitudin convallis.
-	Mauris eu augue congue, aliquet mi at, ullamcorper metus. In sed convallis mi.
-	Fusce sollicitudin sodales felis, ut convallis nibh iaculis a. Aenean volutpat malesuada auctor.
-	Suspendisse hendrerit nulla ligula, vitae hendrerit nibh semper sit amet. Aenean fringilla ornare fringilla.
-	Etiam in est tristique est lobortis vehicula. Vestibulum finibus porta dui.
-	Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
-	Integer a nulla sed tortor elementum vehicula. Nulla tempor lorem arcu, non scelerisque arcu mattis ac. Morbi quis egestas ex.\n
-	\n
-	Duis facilisis hendrerit iaculis. Vivamus metus nulla, faucibus sit amet mattis sit amet, eleifend non massa.
-	Vestibulum lectus urna, aliquet vel magna eget, porttitor euismod turpis. Fusce eget sem ac massa dictum lacinia id vel leo.
-	Donec eget posuere dolor. Fusce fringilla sapien sed metus porta finibus. Etiam a ex vitae felis tempus sollicitudin sodales vel elit.
-	Nulla facilisi. Pellentesque consequat enim at nulla mollis viverra.\n
-	\n
-	Etiam posuere nibh dui, in convallis elit eleifend id. Sed orci purus, blandit eget nisi quis, congue suscipit libero. Nulla facilisi.
-	Duis at scelerisque metus, feugiat consequat ligula. Sed eget ultricies arcu, et aliquet diam.
-	Aliquam porttitor neque enim, eu viverra purus tempus et. Suspendisse in gravida ligula, a aliquet lacus.
-	"""
-
-	body += imgs.render(doc)
-	body += acro.render(doc)
-	body += glossary.render(doc)
-	body += bib.render(doc)
-			  
-	await doc.store(output_path, output_fname)
+	### Importing
+	body += document.import_part('sections/imported_lorem_ipsum.py', index=index)

@@ -1,6 +1,6 @@
-from typing import *
-
 from Lang.style.defaults import DEFAULT_CLEAR
+
+from Lang.compatibility import *
 
 def clear(
 		  block: 'Block', 

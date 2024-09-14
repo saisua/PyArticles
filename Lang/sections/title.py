@@ -1,6 +1,3 @@
-from typing import *
-from typing import Any
-
 from Lang.html.base_tag import _OpenBaseTag, BaseTag, Block
 from Lang.html.h import h
 from Lang.text.text import _text as text
@@ -8,6 +5,7 @@ from Lang.style.new_page import new_page
 
 from Lang.id import TITLE_ID
 
+from Lang.compatibility import *
 
 class title(BaseTag):
 	title: str
@@ -23,7 +21,41 @@ class title(BaseTag):
 
 		new_page(self)
 
-	def __call__(self, document: 'Document', *args: Any, **kwargs: Any) -> _OpenBaseTag:
+	def __repr__(self) -> str:
+		repr = ['<title']
+
+		if(self.title is not None):
+			if(isinstance(self.title, str)):
+				if(len(self.title) > 10):
+					repr.append(f" title={self.title[:10]}...")
+				else:
+					repr.append(f" title={self.title}")
+			else:
+				repr.append(f" title={self.title.__repr__()}")
+
+		if(self.subtitle is not None):
+			if(isinstance(self.subtitle, str)):
+				if(len(self.subtitle) > 10):
+					repr.append(f" subtitle={self.subtitle[:10]}...")
+				else:
+					repr.append(f" subtitle={self.subtitle}")
+			else:
+				repr.append(f" subtitle={self.subtitle.__repr__()}")
+
+		if(self.authors is not None):
+			if(isinstance(self.authors, str)):
+				if(len(self.authors) > 10):
+					repr.append(f" authors={self.authors[:10]}...")
+				else:
+					repr.append(f" authors={self.authors}")
+			else:
+				repr.append(f" authors={self.authors.__repr__()}")
+
+		repr.append('>')
+
+		return ''.join(repr)
+
+	def __call__(self, document: 'Document', *args: Any, mode: str | int=None, **kwargs: Any) -> _OpenBaseTag:
 		if(self.title):
 			if(isinstance(self.title, str)):
 				self._next.append(

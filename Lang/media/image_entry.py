@@ -1,5 +1,3 @@
-from typing import *
-
 from itertools import chain
 
 from Lang.core.block import Block
@@ -21,15 +19,31 @@ from Lang.lists.unordered import unordered_list
 
 from Lang.defaults import DEFAULT_FIGURE_REF_PREFIX
 
+from Lang.compatibility import *
+
 class DelayedImageEntryReference(Block):
 	_entry: 'Image_entry'
+	_called: bool = False
 
 	def __init__(self, entry: 'Image_entry'):
 		self._entry = entry
 
 		super().__init__()
 
-	def __call__(self, document: 'Document', *args: Any, **kwargs: Any):
+	def __repr__(self) -> str:
+		"""
+		Shows information about the useful attributes of the object when printed
+		Any attribute with length is only shown when length > 0
+		The id is not shown
+		For the class attributes of type string, keep up to 15 characters max, and if the string is longer than that, add an ellipsis
+		"""
+		return f"<DelayedImageEntryReference: _entry={self._entry!r}>"
+
+	def __call__(self, document: 'Document', *args: Any, mode: str | int=None, **kwargs: Any):
+		if(self._called):
+			return
+		self._called = True
+
 		self._next.append(
 			a(f"{document._lang_data['FIGURE']} {self._entry.num}", href=self._entry.reference)
 		)
@@ -46,42 +60,55 @@ class Image_entry(MediaTag):
 		self.src = src
 		self.caption = caption
 
-		if(num is not None):
-			self.images._rendered.add(self.src)
+		if(num is None):
+			num = len(self.images._rendered)
 
 		self.num = num
 
+		self.images._rendered.add(self.src)
+
 		super().__init__(tag='div', **kwargs)
 
-	def __parse_caption(self, caption) -> list:
+	def __repr__(self) -> str:
+		"""
+		Shows information about the useful attributes of the object when printed
+		Any attribute with length is only shown when length > 0
+		The id is not shown
+		For the class attributes of type string, keep up to 15 characters max, and if the string is longer than that, add an ellipsis
+		"""
+		return f"<Image_entry num={self.num!r}, src={self.src!r}, caption={self.caption!r}>"
+
+	def _parse_caption(self, caption, document: Optional['Document']=None) -> list:
 		if(caption is None):
 			return []
-		elif(isinstance(caption, (list, tuple))):
-			return caption
+		
 		elif(isinstance(caption, str)):
-			return [text(caption)]
+			if(document is not None):
+				replacements = document._replacements
+			else:
+				replacements = {}
+			
+			return [text(f" {caption}", replacements=replacements)]
 		else:
-			return [caption]
+			return [text(' '), caption]
 
-	def __call__(self, document: 'Document', *args: Any, **kwargs: Any) -> None:
+	def render(self, document: 'Document', mode: str | int=None) -> MediaTag:
 		if(self.num is None):
 			self.num = len(self.images._rendered)
 			self.images._rendered.add(self.src)
 
-		self._next.append(
-			image(
-				src=self.src,
-				caption=span([
-					b(
-						text(f"{document._lang_data['FIGURE']} {self.num}: "),
-						id=f"{DEFAULT_FIGURE_REF_PREFIX}{self.src}",
-					),
-					*self.__parse_caption(self.caption)
-				]),
-				style=self.style
-			),
+		return image(
+			src=self.src,
+			caption=span([
+				b(
+					text(f"{document._lang_data['FIGURE']} {self.num}:"),
+					id=f"{DEFAULT_FIGURE_REF_PREFIX}{self.src}",
+				),
+				*self._parse_caption(self.caption, document)
+			]),
+			style=self.style
 		)
 
-	def render(self) -> DelayedImageEntryReference:
+	def __call__(self, document: 'Document', *args: Any, mode: str | int=None, **kwargs: Any) -> DelayedImageEntryReference:
 		return DelayedImageEntryReference(self)
 

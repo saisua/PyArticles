@@ -1,13 +1,12 @@
-from typing import *
-from typing import Any
-
 from Lang.acronyms.base_acronym_entry import BaseAcronymEntry
 from Lang.html.span import span
 from Lang.html.a import a
 from Lang.text.text import _text
 
+from Lang.compatibility import *
+
 class AcronymWithCiteEntry(BaseAcronymEntry):
-	def __call__(self, doc: 'document'=None) -> Any:
+	def __call__(self, doc: 'document'=None, mode: str | int=None) -> Any:
 		self.counter += 1
 		if(self.counter == 1):
 			self._registry._used.add(self.short)
@@ -19,6 +18,17 @@ class AcronymWithCiteEntry(BaseAcronymEntry):
 				cite
 			])
 		return a(_text(self.short), href=self.reference)
+	
+	def __repr__(self) -> str:
+		data = []
+		if(self.short):
+			data.append(f"short={self.short!r}")
+		if(self.long):
+			if(isinstance(self.long, str) and len(self.long) > 15):
+				data.append(f"long={self.long[:15]}...")
+			else:
+				data.append(f"long={self.long!r}")
+		return f"<AcronymWithCiteEntry{' ' if len(data) > 0 else ''}{' '.join(data)}>"
 	
 	
 	def __str__(self) -> str:
@@ -34,7 +44,7 @@ class AcronymWithCiteEntry(BaseAcronymEntry):
 		return self._plural_wc_cls(self)
 
 	class _plural_wc_cls(BaseAcronymEntry._plural_cls):
-		def __call__(self, doc: 'document'=None) -> Any:
+		def __call__(self, doc: 'document'=None, mode: str | int=None) -> Any:
 			self.counter += 1
 			if(self.counter == 1):
 				self._bacr._registry._used.add(self._bacr.short)

@@ -8,15 +8,14 @@ from Lang.html.h import h
 from Lang.html.a import a
 from Lang.lists.unordered import unordered_list
 
-async def generate(output_path: str, output_fname: str):
-	doc = Document(output_path)
+doc = Document()
 
+@doc.attach
+async def generate(doc: Document):
 	body = doc.body
-	body += h(1, text("Documents"))\
+	body += h(1, "Documents")
 
 	body += unordered_list([
-		a(text(f"{doc_name}/"), href=f"/{doc_name}")
+		a(f"{doc_name}/", href=f"/{doc_name}")
 		for doc_name in os.listdir('Documents/generated')
 	])
-
-	await doc.store(output_path, output_fname)

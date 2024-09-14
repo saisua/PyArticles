@@ -1,6 +1,6 @@
-from typing import *
-
 from Lang.style.defaults import DEFAULT_IN_NEW_PAGE
+
+from Lang.compatibility import *
 
 def in_new_page(block: Optional['Block']) -> Self:
 	if(block is None):

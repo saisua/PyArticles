@@ -1,6 +1,6 @@
-from typing import *
-
 from Lang.style.defaults import DEFAULT_APPLY_TO_TEXT_WITH_NEWLINES, DEFAULT_MARGIN_RIGHT
+
+from Lang.compatibility import *
 
 def margin_right(block: 'Block', margin: str) -> Self:
 	margin_right_key, margin_right_value = DEFAULT_MARGIN_RIGHT

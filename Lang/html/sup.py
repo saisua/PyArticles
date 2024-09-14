@@ -1,18 +1,22 @@
-from typing import *
-
 from Lang.core.block import Block
 from Lang.html.text_tag import TextTag
 from Lang.id import SUP_ID
+
+from Lang.style.defaults import DEFAULT_VERTICAL_ALIGN, DEFAULT_FONT_SIZE
+
+from Lang.compatibility import *
 
 class sup(TextTag):
 	def __init__(self, next_blocks: List[Block] | None = None, *args, **kwargs) -> None:
 		style = kwargs.get('style', dict())
 
-		# TODO: Change to Final strings
-		if('vertical-align' not in style):
-			style['vertical-align'] = 'super'
-		if('font-size' not in style):
-			style['font-size'] = 'smaller'
+		alignment_key, alignment_value = DEFAULT_VERTICAL_ALIGN
+		if(alignment_key not in style):
+			style[alignment_key] = alignment_value.format(alignment="super")
+
+		font_size_key, font_size_value = DEFAULT_FONT_SIZE
+		if(font_size_key not in style):
+			style[font_size_key] = font_size_value.format(size='smaller')
 
 		kwargs['style'] = style
 

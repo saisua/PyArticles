@@ -1,11 +1,11 @@
-from typing import *
-
 import asyncio
 import os
 import binascii
 from itertools import chain
 
 from Lang.defaults import DEFAULT_GOTO_REFERENCE_KEY, DEFAULT_REFERENCE_KEY
+
+from Lang.compatibility import *
 
 class MergedOpenBlock:
 	_open_blocks: List['OpenBlock']
@@ -60,8 +60,14 @@ class Block:
 	_next: List['Block']
 	_children: Set[int]
 
+	_created_blocks: int=0
+	_num_created_block: int
+
 	def __init__(self, fn=None, *args, block_id: int=None, next_blocks: Optional[List['Block']]=None, **kwargs) -> None:
 		self._id = block_id
+
+		self._num_created_block = Block._created_blocks
+		Block._created_blocks += 1
 
 		self.style = kwargs.pop('style', dict())
 
@@ -80,12 +86,21 @@ class Block:
 				
 			if(len(next_blocks)):
 				self._next = list(filter(lambda x: x is not None, next_blocks))
-				for block in self._next:
+
+				block_queue = self._next.copy()
+				while(len(block_queue)):
+					block = block_queue.pop(0)
+
 					if(isinstance(block, str)):
 						from Lang.text.text import _text
 						block = _text(block)
-					self._children.add(block._id)
-					self._children.update(block._children)
+					elif(isinstance(block, (list, tuple))):
+						block_queue.extend(block)
+					else:
+						self._children.add(block._id)
+						self._children.update(block._children)
+			else:
+				self._next = list()
 		else:
 			self._next = list()
 
@@ -106,19 +121,23 @@ class Block:
 
 	# Implement hash
 
-	def __call__(self, document: 'Document', *args: Any, **kwargs: Any) -> Optional[OpenBlock]:
+	def __call__(self, document: 'Document', *args: Any, mode: str | int=None, **kwargs: Any) -> Optional[OpenBlock]:
 		if(self._fn is not None):
 			args, kwargs = self._merge_args_kwargs(args, kwargs)
 
 			self._fn(document, *args, **kwargs)
 
-		# return OpenBlock()
-	
 	def __getitem__(self, id: int) -> 'Block':
 		if(id == self._id): 
 			return self
-		
-		for block in self._next:
+
+		block_queue = self._next.copy()
+		while(len(block_queue)):
+			block = block_queue.pop(0)
+			if(isinstance(block, (list, tuple))):
+				block_queue.extend(block)
+				continue
+
 			if(id == block._id):
 				return block
 			if(id in block):
@@ -134,9 +153,13 @@ class Block:
 		if(not self._next):
 			return
 		
-		objs_queue: List['Block'] = self._next
+		objs_queue: List['Block'] = self._next.copy()
 		while(len(objs_queue)):
 			obj = objs_queue.pop(0)
+
+			if(isinstance(obj, (list, tuple))):
+				objs_queue.extend(obj)
+				continue
 
 			yield obj
 			
@@ -153,10 +176,6 @@ class Block:
 		if(isinstance(block, (list, tuple))):
 			for sub_block in block:
 				self.__add__(sub_block)
-		elif(isinstance(block, str)):
-			from Lang.text.text import text
-
-			self.__add__(text(block))
 		else:
 			self._next.append(block)
 

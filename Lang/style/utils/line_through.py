@@ -1,6 +1,6 @@
-from typing import *
-
 from Lang.style.defaults import DEFAULT_LINE_THROUGH
+
+from Lang.compatibility import *
 
 def line_through(block: Optional['Block'], *, overline=False, underline=False, through=False):
 	if(block is None):

@@ -1,0 +1,22 @@
+INDEX='Índex'
+SECTION='Secció'
+SUBSECTION='Subsecció'
+PARAGRAPH='Paragraf'
+LINE='Linia'
+SENTENCE='Frase'
+WORD='Paraula'
+LETTER='Lletra'
+
+INTRODUCTION='Introducció'
+TABLE_OF_CONTENTS='Taula de contenguts'
+LIST_OF_FIGURES='Llista de figures'
+LIST_OF_TERMS='Llista de termes'
+ACKNOWLEDGEMENTS='Agraïments'
+BACKGROUND='Transfons'
+THEORY='Teoria'
+PROCEDURE='Procediment'
+DISCUSSION='Discussió'
+CONCLUSION='Conclusió'
+RECOMMENDATIONS='Recomanacions'
+
+all = globals()

@@ -1,9 +1,9 @@
-from typing import *
-
 from Lang.html.base_tag import Block
 from Lang.html.text_tag import TextTag
 from Lang.media.media_tag import MediaTag
 from Lang.id import FIGURE_ID
+
+from Lang.compatibility import *
 
 class figure(MediaTag):
 	image: MediaTag

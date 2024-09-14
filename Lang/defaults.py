@@ -1,4 +1,4 @@
-from typing import *
+from Lang.compatibility import *
 
 DEFAULT_STATIC_FOLDER: Final[str] = 'static'
 DEFAULT_REFERENCE_KEY: Final[str] = 'id'

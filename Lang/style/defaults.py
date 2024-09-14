@@ -1,4 +1,4 @@
-from typing import *
+from Lang.compatibility import *
 
 DEFAULT_PAGE_BREAK: Final[Tuple[str, str]] = ("page-break-after", "always")
 DEFAULT_IN_NEW_PAGE: Final[Tuple[str, str]] = ("page-break-before", "always")
@@ -17,3 +17,4 @@ DEFAULT_DISPLAY: Final[Tuple[str, str]] = ("display", "{display}")
 DEFAULT_LINE_THROUGH: Final[Tuple[str, str]] = ("text-decoration", "{line_through}")
 DEFAULT_VERTICAL_ALIGN: Final[Tuple[str, str]] = ("vertical-align", "{alignment}")
 DEFAULT_APPLY_TO_TEXT_WITH_NEWLINES: Final[Tuple[str, str]] = ("box-decoration-break", "clone")
+DEFAULT_FONT_SIZE: Final[Tuple[str, str]] = ("font-size", "{size}")

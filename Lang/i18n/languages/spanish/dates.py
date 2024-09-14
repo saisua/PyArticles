@@ -16,7 +16,7 @@ AUGUST='Agosto'
 SEPTEMBER='Septiembre'
 OCTOBER='Octubre'
 NOVEMBER='Noviembre'
-DECEMBER='diciembre'
+DECEMBER='Diciembre'
 
 MONDAY='Lunes'
 TUESDAY='Martes'

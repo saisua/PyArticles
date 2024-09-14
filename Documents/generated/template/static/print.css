@@ -1,7 +1,7 @@
 @page {
 	size: A4;
 
-	margin-top: 90%;
+	margin-top: 10%;
 }
 
 @media print {
@@ -10,8 +10,12 @@
 	}
 
 	body {
+		white-space: pre-wrap;
 		background-color: #FFF; 
 		color: #000;
+		-webkit-print-color-adjust: exact;
+		text-align: justify;
+		text-justify: inter-word;
 	}
 
 	figure {
@@ -33,5 +37,9 @@
 		page-break-before: always;
 		min-height: 1em;
 		margin-bottom: 10%;
+	}
+
+	tbody tr:nth-child(even) {
+		background-color: #f3f3f333;
 	}
 }

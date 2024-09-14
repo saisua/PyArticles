@@ -1,5 +1,3 @@
-from typing import *
-
 from Lang.core.block import Block
 from Lang.html.text_tag import TextTag
 from Lang.text.text import _text as text
@@ -7,6 +5,7 @@ from Lang.id import TD_ID, TR_ID, TH_ID, TBODY_ID, TABLE_ID
 
 from pandas import DataFrame
 
+from Lang.compatibility import *
 
 class _td(TextTag):
 	def __init__(self, next_blocks: str | Block | List[Block], *args, **kwargs) -> None:
@@ -65,9 +64,12 @@ class table(TextTag):
 			**kwargs
 		)
 
+	def __repr__(self) -> str:
+		return "<Table>"
+
 	@staticmethod
 	def from_pandas(df: DataFrame) -> TextTag:
 		return table(
-			header=df.columns.tolist(),
-			items=df.values.tolist(),
+			header=df.columns.astype(str).tolist(),
+			items=df.astype(str).values.tolist(),
 		)

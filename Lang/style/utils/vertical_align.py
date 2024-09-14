@@ -1,6 +1,6 @@
-from typing import *
-
 from Lang.style.defaults import DEFAULT_VERTICAL_ALIGN
+
+from Lang.compatibility import *
 
 def vertical_align(
 		block: Optional['Block'], 

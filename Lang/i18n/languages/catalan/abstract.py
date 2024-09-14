@@ -1,0 +1,3 @@
+ABSTRACT='Resum'
+
+all = globals()

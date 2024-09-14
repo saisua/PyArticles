@@ -1,5 +1,3 @@
-from typing import *
-
 from Lang.core.block import Block
 
 from Lang.html.a import a
@@ -7,6 +5,8 @@ from Lang.html.a import a
 from Lang.text.text import _text
 
 from Lang.id import ACRONYM_ID
+
+from Lang.compatibility import *
 
 class BaseAcronymEntry(Block):
 	_registry: 'BaseAcronyms'
@@ -34,6 +34,30 @@ class BaseAcronymEntry(Block):
 		self._transformations = []
 
 		super().__init__(block_id=ACRONYM_ID)
+
+	def __repr__(self) -> str:
+		data = []
+
+		if(self._short):
+			data.append(f"short={self._short!r}")
+
+		if(self._short_plural):
+			data.append(f"short_plural={self._short_plural!r}")
+
+		if(self._long):
+			if(len(self._long) > 15):
+				data.append(f"long={self._long[:15]}...")
+			else:
+				data.append(f"long={self._long!r}")
+
+		if(self._long_plural):
+			if(len(self._long_plural) > 15):
+				data.append(f"long_plural={self._long_plural[:15]}...")
+			else:
+				data.append(f"long_plural={self._long_plural!r}")
+
+		return f"<BaseAccronymEntry{' ' if len(data) > 0 else ''}{' '.join(data)}>"
+
 
 	def clear(self) -> None:
 		self.counter = 0

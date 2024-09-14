@@ -5,9 +5,13 @@ from Lang.formulas.mathml.html.mfrac import mfrac
 from Lang.formulas.mathml.html.mrow import mrow
 from Lang.formulas.mathml.html.mn import mn
 
+from Lang.html.div import div
+
 from Lang.text.text import _text as text
 
 from Lang.html.base_tag import BaseTag
+
+from Lang.compatibility import *
 
 class Division(BaseVar):
 	def __init__(self, d0: BaseVar | str | int, d1: BaseVar | str | int, ) -> None:
@@ -17,6 +21,9 @@ class Division(BaseVar):
 			d1 = Value(d1)
 
 		self._data = (d0, d1)
+
+	def __repr__(self) -> str:
+		return f"<Division {self._data[0]!r} / {self._data[1]!r}>"
 
 	def compute(self, **kwargs):
 		d0 = self._data[0]
@@ -42,6 +49,7 @@ class Division(BaseVar):
 		else:
 			d1 = text(str(d1))
 
+		# Idk why, but there can't be a 'div' returned here
 		return mfrac([
 			mrow(d0),
 			mrow(d1),

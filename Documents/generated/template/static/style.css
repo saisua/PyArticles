@@ -1,7 +1,10 @@
 body {
+	white-space: pre-wrap;
 	background-color: #444; 
 	color: #BBB;
-	font-size: 0.875em; // 14px
+	font-size: 0.875em;
+	text-align: justify;
+	text-justify: inter-word;
 }
 
 .title {
@@ -20,6 +23,11 @@ body {
 
 a[href] {
 	color: red;
+}
+
+div {
+	white-space: pre;
+	tab-size: 4;
 }
 
 table {

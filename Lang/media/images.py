@@ -1,10 +1,9 @@
-from typing import *
-
 from itertools import chain
 
 import os
 import tempfile
 import pickle as pkl
+from typing import Coroutine
 
 from plotly import graph_objects as go
 
@@ -13,6 +12,7 @@ from Lang.core.block import Block
 
 from Lang.media.image_entry import Image_entry
 
+from Lang.plugin import Plugin
 from Lang.html.text_tag import TextTag
 
 from Lang.html.h import h
@@ -27,28 +27,30 @@ from Lang.lists.unordered import unordered_list
 
 from Lang.defaults import DEFAULT_FIGURE_REF_PREFIX, DEFAULT_REFERENCE_KEY
 
+from Lang.compatibility import *
 
 class DelayedImages(Block):
 	_images: 'Images'
+	_called: bool=False
 
 	def __init__(self, images: 'Images'):
 		self._images = images
 
 		super().__init__()
 
-	def __parse_caption(self, caption) -> list:
-		if(caption is None):
-			return []
-		elif(isinstance(caption, (list, tuple))):
-			return [text(' '), *caption]
-		elif(isinstance(caption, str)):
-			return [text(f" {caption}")]
-		else:
-			return [text(' '), caption]
+	def __repr__(self) -> str:
+		"""
+		Shows information about the useful attributes of the object when printed
+		Any attribute with length is only shown when length > 0
+		The id is not shown
+		For the class attributes of type string, keep up to 15 characters max, and if the string is longer than that, add an ellipsis
+		"""
+		return f"<DelayedImages images={self._images!r}>"
 
-	def __call__(self, document: 'Document', *args: Any, **kwargs: Any) -> None:
-		if(not len(self._images._entries)):
+	def __call__(self, document: 'Document', *args: Any, mode: str | int=None, **kwargs: Any) -> None:
+		if(self._called or not len(self._images._entries)):
 			return
+		self._called = True
 
 		images = sorted((
 				entry
@@ -68,29 +70,43 @@ class DelayedImages(Block):
 							b(f"{document._lang_data['FIGURE']} {entry.num}:"),
 							href=f"#{entry._kwargs[DEFAULT_REFERENCE_KEY]}"
 						),
-						*self.__parse_caption(entry.caption),
+						*entry._parse_caption(entry.caption),
 					])
 					for entry in images
 				]),
 			])
 		])
 
-class Images:
+class Images(Plugin):
 	__tempfiles_path: str
 	__tempfiles: Dict[str, str]
 	_entries: Dict[str, Image_entry]
 	_rendered: Set[str]
 
+	_static_folder: str
 	_static_path: str = None
 
-	def __init__(self) -> None:
+	def __init__(self, static_folder: str = 'static') -> None:
 		self._entries = dict()
 		self._rendered = set()
 		self.__tempfiles = None
+		self.__tempfiles_path = None
 
-	def clear(self):
+		self._static_folder = static_folder
+
+	def __repr__(self) -> str:
+		return '<Images>'
+
+	async def setup(self, output_path, output_fname, doc: 'Document') -> None:
+		self.static_path = os.path.join(output_path, self._static_folder)
+		self._is_plugin_setup = True	
+
+	async def clear(self):
 		self._entries.clear()
 		self._rendered.clear()
+
+	async def render(self, document: 'document', mode: str | int=None) -> DelayedImages:
+		return DelayedImages(self)
 
 	def _flush(self):
 		self.__tempfiles.clear()
@@ -107,9 +123,6 @@ class Images:
 
 	def __call__(self, name: str) -> Optional[Image_entry]:
 		return self._entries.get(name)
-
-	def render(self, document: 'document') -> DelayedImages:
-		return DelayedImages(self)
 
 	def from_plotly(self, fig: go.Figure, /, caption: str=None, *args, **kwargs) -> Image_entry:
 		if(self._static_path is None):

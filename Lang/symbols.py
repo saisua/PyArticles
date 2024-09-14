@@ -1,4 +1,9 @@
-from enum import StrEnum
+try:
+	from enum import StrEnum
+except ImportError:
+	...
+
+from Lang.compatibility import *
 
 class Symbols(StrEnum):
 	ABSOLUTE_SYMBOL = '|'

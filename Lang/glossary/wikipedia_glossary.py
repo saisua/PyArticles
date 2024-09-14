@@ -1,4 +1,3 @@
-from typing import Any
 import wikipedia
 
 import re
@@ -6,6 +5,8 @@ import re
 from Lang.glossary.base_glossary import BaseGlossary
 
 from Lang.glossary.base_glossary_entry import BaseGlossaryEntry
+
+from Lang.compatibility import *
 
 wiki_ref_pattern = re.compile(r'\[\d+\]')
 
@@ -16,14 +17,17 @@ class WikipediaGlossary(BaseGlossary):
 
 		super().__init__()
 	
-	def add(self, name: str, description: str=None, *args: Any, **kwargs: Any) -> BaseGlossaryEntry:
+	def add(self, name: str, description: str=None, *args: Any, search: str=None, **kwargs: Any) -> BaseGlossaryEntry:
 		if(description is None):
+			if(search is None):
+				search = name
 			try:
 				description = wiki_ref_pattern.sub(
 					'',
-					str(wikipedia.summary(name))
+					str(wikipedia.summary(search))
 				)
 			except Exception as err:
+				description = "[WIKIPEDIA GLOSSARY FAILED DUE TO NUMBER OF REQUESTS]"
 				print(f"[-] WikipediaGlossary: {err}")
 
 		entry = BaseGlossaryEntry(name=name, description=description)

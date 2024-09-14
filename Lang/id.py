@@ -1,5 +1,6 @@
-from typing import *
 from enum import IntEnum
+
+from Lang.compatibility import *
 
 class IDs(IntEnum):
 	HTML_ID: Final[int] = 1
@@ -43,6 +44,9 @@ class IDs(IntEnum):
 	FIGCAPTION_ID: Final[int] = 38
 	BR_ID: Final[int] = 39
 	SUP_ID: Final[int] = 40
-	MROW_ID: Final[int] = 41
+	MSUP_ID: Final[int] = 41
+	MROW_ID: Final[int] = 42
+	ABSTRACT_ID: Final[int] = 43
+	TT_ID: Final[int] = 44
 
 globals().update(dict(filter(lambda x: not x[0].startswith('_'), IDs.__dict__.items())))

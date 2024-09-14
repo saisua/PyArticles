@@ -1,6 +1,6 @@
-from typing import *
-
 from Lang.style.defaults import DEFAULT_ALIGN_TEXT
+
+from Lang.compatibility import *
 
 def align_text(
 		block: 'Block', 
