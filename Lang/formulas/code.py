@@ -193,6 +193,8 @@ class Code:
             return "Float"
         elif type_ is bool:
             return "Boolean"
+        elif type(type_) is str:
+            return type_
         # Add more mappings as needed
         else:
             return str(type_).replace('typing.', '').title() 
