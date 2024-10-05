@@ -106,4 +106,21 @@ class Symbols(StrEnum):
 	PSY_SYMBOL = 'ψ'
 	OMEGA_SYMBOL = 'ω'
 
+	KILO_SYMBOL = 'k'
+	MILI_SYMBOL = 'm'
+	NANO_SYMBOL = 'n'
+	FEMTO_SYMBOL = 'f'
+	ATTO_SYMBOL = 'a'
+
+class SymbolAliases:
+	SUM_SYMBOL = Symbols.CAPITAL_SIGMA_SYMBOL
+
+	MICRO_SYMBOL = Symbols.MU_SYMBOL
+	PICO_SYMBOL = Symbols.RHO_SYMBOL
+
+class SpecialSymbols:
+	...
+
 globals().update(dict(filter(lambda x: not x[0].startswith('_'), Symbols.__dict__.items())))
+globals().update(dict(filter(lambda x: not x[0].startswith('_'), SymbolAliases.__dict__.items())))
+globals().update(dict(filter(lambda x: not x[0].startswith('_'), SpecialSymbols.__dict__.items())))
