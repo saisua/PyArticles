@@ -27,3 +27,5 @@ DO_WHILE = "Do while"
 EXECUTE = "Execute"
 CALL = "Call"
 ASSIGN = "Assig"
+
+all = globals()
