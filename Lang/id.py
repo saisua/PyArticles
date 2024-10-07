@@ -48,5 +48,6 @@ class IDs(IntEnum):
 	MROW_ID: Final[int] = 42
 	ABSTRACT_ID: Final[int] = 43
 	TT_ID: Final[int] = 44
+	MARKDOWN_ID: Final[int] = 45
 
 globals().update(dict(filter(lambda x: not x[0].startswith('_'), IDs.__dict__.items())))

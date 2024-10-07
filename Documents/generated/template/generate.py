@@ -16,6 +16,8 @@ from Lang.formulas.var import Var
 from Lang.formulas.formula import Formula
 from Lang.formulas.code import Code	
 
+from Lang.markdown_text.markdown_text import markdown_text
+
 from Lang.sections.index import Index
 from Lang.citations.base_citations import Citations
 from Lang.acronyms.with_cite.acronyms_with_cite import AcronymsWithCite
@@ -180,7 +182,8 @@ async def generate(document: Document) -> Document:
 		formulas_index += f"-nlExample 2: softmax(4, e=2): {softmax.compute(x=4, e=2)}"
 
 	### Tables
-	body += index(document.keywords.Pandas_table).render()
+	body += index(document.keywords.Pandas_table).render()\
+	.clear()
 
 	body += "We can easily generate a table from a dataframe, no need of looking up the syntax on how to make a table"
 
@@ -201,6 +204,36 @@ async def generate(document: Document) -> Document:
 	body += imgs.from_plotly(px.scatter(data, y="Total"), caption="Plotted the table's Total columns")\
 	.render(document)\
 	.float('center')
+
+	### Markdown
+	body += index("Markdown").render()\
+	.clear()
+
+	body += """
+	-nl
+	We can also use markdown in the documentument, and to generate it
+	-nl
+	"""
+
+	body += markdown_text("""
+	> _"Markdown allows you to express ideas clearly and beautifully!"_  
+	> — **John Doe**
+
+	---
+
+	### Code Blocks & Syntax Highlighting
+
+	You can include inline code like `const x = 10;`, or full code blocks:
+
+	```javascript
+	// JavaScript example:
+	function greet(name) {
+		return 'Hello, ${name}!';
+	}
+
+	console.log(greet("Markdown"));
+	```
+	""")
 
 	### Importing
 	body += document.import_part('sections/imported_lorem_ipsum.py', index=index)
