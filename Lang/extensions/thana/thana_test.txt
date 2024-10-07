@@ -1,0 +1,109 @@
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dictum vehicula
+ligula, sit amet finibus massa placerat ut. Duis lobortis nibh ipsum, eget consectetur
+metus malesuada at. In nec ex vitae nulla finibus interdum sit amet eget sem.
+Suspendisse vitae eros id arcu rutrum efficitur sit amet non metus. Morbi enim
+turpis, ultrices ac diam vel, hendrerit interdum mauris. Phasellus egestas dolor
+vitae egestas auctor. Nam aliquet leo ac egestas efficitur. Proin id ultrices mauris.
+
+--- print test1
+--- split , : Hi,what,is,up
+--- load ./Lang/extensions/thana/thana_test_load.txt
+
+--- condition(5 > 3, 2 < 4): Condition 1 success
+--- condition(5 < 3, 2 < 4): Condition 2 failure
+
+--- repeat This should be twice
+--- repeat 3: This should be trice
+--- repeat 3 (sep= -> ): This also should be trice
+
+--- Py 3*10
+
+Duis porttitor tristique tortor eget porta. Curabitur accumsan mi non eros facilisis
+porttitor. Mauris commodo commodo pretium. Sed ex est, mattis ac ipsum nec,
+euismod cursus augue. Ut et egestas sapien, accumsan rhoncus risus. Donec cursus
+pharetra eros, in pulvinar mauris mattis at. Vestibulum facilisis malesuada
+ex. Ut malesuada risus ut ex tempor ornare.
+
+---print test2 (many_other, sep=\n)
+
+Nunc tempus mauris sed tortor pharetra rhoncus. Ut feugiat eleifend sem nec
+malesuada. Duis lorem tortor, dapibus nec luctus eu, ultricies sit amet nisi.
+Ut blandit nisi sapien, vel aliquam ex commodo ut. Integer malesuada ex mi,
+eget facilisis eros pharetra id. Proin luctus dui malesuada sapien bibendum
+malesuada vitae at orci. Quisque tincidunt nulla at leo blandit, eu blandit
+ipsum congue. Pellentesque ornare vitae nibh nec ullamcorper.
+
+--- print test3: Hi what's up
+
+Nullam sit amet sodales sapien, sit amet luctus lacus. Vivamus finibus ultricies
+felis, elementum fermentum eros pretium sed. Quisque sollicitudin lobortis molestie.
+Nam vitae volutpat sem, vitae maximus lorem. Lorem ipsum dolor sit amet, consectetur
+adipiscing elit. Curabitur sit amet dictum diam. Praesent at fermentum magna.
+Pellentesque at ullamcorper nibh. In nec odio sit amet urna molestie volutpat
+faucibus ullamcorper ex. Nam consectetur lacus sem, vitae sodales tortor aliquet
+commodo. Aliquam a interdum magna, vel iaculis sem. Sed eu semper diam. Maecenas
+dapibus orci eu nisl bibendum tristique. Praesent quis ligula at libero cursus
+vulputate. Duis dui massa, vulputate ut eleifend sit amet, porta vitae justo. Aenean a aliquet sapien.
+
+---print test4 (many_other, sep=\n): Hi what is up
+
+Cras eu leo eu metus tincidunt faucibus. Suspendisse non orci non ipsum tristique
+dignissim. Duis tincidunt mauris non ligula congue, in fringilla purus fringilla.
+Phasellus ac justo felis. Vivamus vitae arcu tellus. Vivamus dignissim suscipit
+velit, in viverra tortor placerat eget. Praesent ligula magna, blandit dapibus
+dictum sed, rhoncus vitae turpis. Proin et pretium leo, sed hendrerit velit.
+Donec elementum dapibus lorem a condimentum. 
+
+--- print test5:
+    args:
+    - Hi what is up
+    - Hella!
+    - sep='...'
+my_text
+---
+
+Duis pharetra sem ac ex fringilla, egestas sodales arcu dignissim. Duis dui
+ante, scelerisque ut sollicitudin efficitur, scelerisque vitae lacus. Aliquam
+tempus orci risus, vel fringilla arcu auctor vel. Ut sit amet felis ut mi fringilla
+placerat vitae quis velit. Phasellus ut est feugiat, auctor lectus vitae, sollicitudin
+leo. Ut vitae dictum tortor. Aliquam nunc ex, mollis non mauris hendrerit, hendrerit
+varius eros. Aenean a risus tempor, hendrerit neque sed, auctor eros. Nulla
+id laoreet justo. Nulla tristique, velit eu bibendum accumsan, turpis sapien
+tincidunt sem, non euismod neque quam nec libero. Suspendisse vel dictum ipsum.
+Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
+himenaeos. Nunc eget placerat tellus. Quisque non erat dapibus, ullamcorper
+lectus at, imperdiet enim. Class aptent taciti sociosqu ad litora torquent per
+conubia nostra, per inceptos himenaeos.
+
+--- print test6 (just inline args, sep=__):
+my_text
+---
+
+Donec vulputate facilisis quam quis placerat. Sed in porta ex, et varius lacus.
+Quisque odio libero, suscipit suscipit nulla sit amet, tincidunt iaculis ligula.
+Phasellus eros enim, sagittis a augue nec, gravida tincidunt lectus. Pellentesque
+nec erat tortor. Fusce eu leo vel erat commodo blandit. Nulla accumsan pellentesque
+ipsum, ut rhoncus lectus laoreet ut.
+
+
+--- print test7:
+-- print inside_test7
+my_text
+---
+
+Curabitur gravida metus neque, quis maximus libero bibendum et. Cras a convallis
+tortor. Cras et augue libero. Maecenas vitae blandit odio, sit amet pharetra
+urna. Mauris quis felis sodales, ornare purus ac, suscipit orci. Sed vel posuere
+ligula, eget auctor purus. Integer vulputate facilisis erat eu facilisis.
+
+
+
+Nulla a magna id ligula dignissim egestas. Sed sed felis mi. Pellentesque elementum
+lorem eget turpis maximus, tristique scelerisque ex iaculis. Vivamus in pellentesque
+augue, lobortis tristique ipsum. Maecenas elementum felis et justo feugiat consectetur.
+In finibus, mauris eget vestibulum condimentum, sapien sem semper mauris, sed
+tempor dui eros eu risus. Quisque ut tortor in elit tempor elementum quis non
+nisi. Donec volutpat scelerisque mauris eu mollis. Vivamus in aliquet mauris,
+non maximus odio. Pellentesque pharetra vitae ligula et fringilla. Sed odio
+quam, vehicula ut enim id, placerat semper nibh. Phasellus nec mauris consequat,
+tincidunt ante ut, ornare mi. 

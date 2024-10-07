@@ -67,6 +67,7 @@ class Document(Plugin):
 		self.tag = tag
 		self.text = text
 		self.line = line
+		self.asis = doc.asis
 
 		self._stylesheet_paths = stylesheets
 		self._script_paths = scripts
@@ -90,6 +91,7 @@ class Document(Plugin):
 	tag: Callable
 	text: Callable
 	line: Callable
+	asis: Callable
 
 	def __getitem__(self, id: int) -> Optional[Block]:
 		for block in self._next:
