@@ -12,6 +12,8 @@ from Lang.core.block import Block
 
 from Lang.media.image_entry import Image_entry
 
+from Lang.media.media_tag import MediaTag
+
 from Lang.plugin import Plugin
 from Lang.html.text_tag import TextTag
 
@@ -120,6 +122,9 @@ class Images(Plugin):
 		self._entries[src] = entry
 
 		return entry
+
+	def add_render(self, src: str, /, caption: str=None, *args: Any, document: 'Document', **kwargs: Any) -> MediaTag:
+		return self.add(src, caption=caption, *args, **kwargs).render(document=document)
 
 	def __call__(self, name: str) -> Optional[Image_entry]:
 		return self._entries.get(name)

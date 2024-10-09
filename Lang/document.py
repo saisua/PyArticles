@@ -9,15 +9,19 @@ import aiofiles
 from Lang.plugin import Plugin
 
 from Lang.core.block import Block, OpenBlock
+
+from Lang.style.stylesheet import stylesheet
+
 from Lang.html.html import html
 from Lang.html.head import head as Head
 from Lang.html.body import body as Body
-from Lang.style.stylesheet import stylesheet
 from Lang.html.script import script
 
 from Lang.i18n.traductions import traductions
 
 from Lang.defaults import DEFAULT_STATIC_FOLDER
+
+from Lang.editor.editor import Editor
 
 from Lang.compatibility import *
 
@@ -45,6 +49,8 @@ class Document(Plugin):
 	_scripts: list = []
 	_plugins: list[Plugin]
 
+	_editor_enabled: bool
+
 	VISUALIZING: int = 1
 	RENDERING: int = 2
 
@@ -59,6 +65,7 @@ class Document(Plugin):
 				 extensions: List[Callable[[Self], Any]]=[],
 				 replacements: Dict[str, Any]={},
 				 plugins: List[Plugin]=[],
+				 enable_editor: bool=True,
 				 **kwargs
 		) -> None:
 		doc, tag, text, line = Doc(*args, **kwargs).ttl()
@@ -84,6 +91,8 @@ class Document(Plugin):
 
 		self.lang = lang
 		self._lang_data = traductions(lang=lang)
+
+		self._editor_enabled = enable_editor
 
 	def __repr__(self) -> str:
 		return f"<Document path=\"{self.path}\" lang={self.lang} scripts={{{len(self._scripts)}}} stylesheets={{{len(self._stylesheets)}}}>"
@@ -128,6 +137,9 @@ class Document(Plugin):
 			self._next.insert(0, html([self._head, self._body]))
 		else:
 			self._next.insert(0, html([self._body]))
+
+		if(self._editor_enabled):
+			self._next.append(Editor())
 
 		open_block_queue: List[List[OpenBlock]] = [[]]
 		block_queue: List[List[Union[Block, str]]] = [self._next]
@@ -319,6 +331,14 @@ class Document(Plugin):
 		self._head = None
 		self._next.clear()
 
+		doc, tag, text, line = Doc().ttl()
+
+		self.doc = doc
+		self.tag = tag
+		self.text = text
+		self.line = line
+		self.asis = doc.asis
+	
 	async def render(self, mode: str | int = VISUALIZING) -> str:
 		return await self._build_doc(mode=mode)
 

@@ -1,6 +1,7 @@
 from Lang.core.block import Block, OpenBlock
 from Lang.defaults import DEFAULT_STATIC_FOLDER
 from Lang.id import LINK_SCRIPT_ID
+from Lang.html.plain import plain
 
 from Lang.compatibility import *
 
@@ -27,7 +28,10 @@ class script(Block):
 		self._defer = defer
 		self._type = type
 
-		super().__init__(*args, block_id=LINK_SCRIPT_ID, next_blocks=next_blocks, **kwargs)
+		if (not isinstance(next_blocks, (list, tuple))):
+			next_blocks = [next_blocks]
+
+		super().__init__(*args, block_id=LINK_SCRIPT_ID, next_blocks=list(map(plain, next_blocks)), **kwargs)
 
 	def __repr__(self) -> str:
 		return f"<Script filename={self.filename!r} defer={self._defer} type={self._type!r}>"

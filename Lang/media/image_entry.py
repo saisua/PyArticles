@@ -92,7 +92,7 @@ class Image_entry(MediaTag):
 		else:
 			return [text(' '), caption]
 
-	def render(self, document: 'Document', mode: str | int=None) -> MediaTag:
+	def render(self, document: 'Document', mode: str | int=None, *args, **kwargs) -> MediaTag:
 		if(self.num is None):
 			self.num = len(self.images._rendered)
 			self.images._rendered.add(self.src)
